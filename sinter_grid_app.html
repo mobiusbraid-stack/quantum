@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SINTER LATTICE // WORK GRID OS</title>
+<style>
+  :root {
+    --bg-dark: #0b0f19;
+    --panel-bg: #161b22;
+    --border-color: #30363d;
+    --accent-cyan: #58a6ff;
+    --accent-amber: #f0883e;
+    --accent-green: #3fb950;
+    --text-main: #c9d1d9;
+    --font-mono: 'Courier New', Courier, monospace;
+    --font-sans: 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    background: #0d1117;
+    border-bottom: 2px solid var(--border-color);
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo-title {
+    font-family: var(--font-mono);
+    color: var(--accent-cyan);
+    font-size: 1.2rem;
+    font-weight: bold;
+    letter-spacing: 1.5px;
+  }
+
+  .mesh-status {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    background: rgba(88, 166, 255, 0.1);
+    border: 1px solid var(--accent-cyan);
+    padding: 5px 12px;
+    border-radius: 4px;
+    color: var(--accent-cyan);
+  }
+
+  /* PORTAL SELECTION PAGE */
+  #portal-selection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 20px;
+    flex: 1;
+  }
+
+  .hero-text {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .hero-text h1 {
+    font-size: 2.2rem;
+    color: var(--accent-cyan);
+    margin-bottom: 10px;
+  }
+  .hero-text p {
+    color: #8b949e;
+    font-size: 1.05rem;
+  }
+
+  .portal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+    width: 100%;
+    max-width: 1100px;
+  }
+
+  .portal-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+
+  .portal-card:hover {
+    border-color: var(--accent-cyan);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(88, 166, 255, 0.15);
+  }
+
+  .portal-card.operator:hover { border-color: var(--accent-amber); }
+  .portal-card.investor:hover { border-color: var(--accent-green); }
+
+  .portal-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+  }
+
+  .portal-title {
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .portal-desc {
+    font-size: 0.9rem;
+    color: #8b949e;
+    line-height: 1.4;
+  }
+
+  /* WORKSPACE DASHBOARD */
+  #workspace {
+    display: none;
+    flex: 1;
+    grid-template-columns: 280px 1fr 320px;
+    height: calc(100vh - 65px);
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: #0d1117;
+    border-right: 1px solid var(--border-color);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .nav-btn {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 12px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    text-align: left;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .nav-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+  .nav-btn.active { background: rgba(88, 166, 255, 0.15); border-color: var(--accent-cyan); }
+
+  /* MAIN WORK GRID */
+  .work-main {
+    padding: 25px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .control-panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+  }
+
+  .input-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    background: #0d1117;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 12px;
+    color: #fff;
+    font-family: var(--font-mono);
+  }
+
+  .btn-exec {
+    background: var(--accent-cyan);
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    padding: 0 25px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+  }
+  .btn-exec:hover { opacity: 0.9; }
+
+  .output-terminal {
+    background: #05070a;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 20px;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    min-height: 350px;
+    max-height: 500px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    line-height: 1.5;
+  }
+
+  /* CHAT MENU SIDEBAR */
+  .chat-panel {
+    background: #0d1117;
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-header {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--accent-cyan);
+    font-weight: bold;
+  }
+
+  .chat-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .chat-msg {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 10px;
+    font-size: 0.85rem;
+  }
+
+  .chat-user {
+    font-family: var(--font-mono);
+    font-weight: bold;
+    color: var(--accent-amber);
+    margin-bottom: 4px;
+  }
+
+  .chat-input-area {
+    padding: 15px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: 8px;
+  }
+
+  .chat-input-area input {
+    font-size: 0.85rem;
+    padding: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-title">SINTER LATTICE // WORK GRID OS v3.0</div>
+  <div class="mesh-status" id="mesh-telemetry">CARRIER: 39,420 Hz // LEGENDRIAN LOCK: 80%</div>
+</header>
+
+<div id="portal-selection">
+  <div class="hero-text">
+    <h1>SELECT OPERATIONAL SECTOR</h1>
+    <p>Access the 1.4M Node Mesh via specialized workspace interfaces.</p>
+  </div>
+
+  <div class="portal-grid">
+    <div class="portal-card architect" onclick="enterWorkspace('ARCHITECT')">
+      <div class="portal-icon">🛠️</div>
+      <div class="portal-title" style="color: var(--accent-cyan);">1. ARCHITECT</div>
+      <div class="portal-desc">Core software engineering, Rust mesh routers, EIP-712 security patches, and zero-knowledge circuit contracts.</div>
+    </div>
+
+    <div class="portal-card operator" onclick="enterWorkspace('OPERATOR')">
+      <div class="portal-icon">🪖</div>
+      <div class="portal-title" style="color: var(--accent-amber);">2. OPERATOR</div>
+      <div class="portal-desc">Field ops, physical node retrievals, dead-drop sweeps, and backbone spine tap integrity runs.</div>
+    </div>
+
+    <div class="portal-card investor" onclick="enterWorkspace('INVESTOR')">
+      <div class="portal-icon">🏛️</div>
+      <div class="portal-title" style="color: var(--accent-green);">3. INVESTOR</div>
+      <div class="portal-desc">4IR DePIN fintech, automated AMM arbitrage cascades, node equity seeding, and yield telemetry.</div>
+    </div>
+  </div>
+</div>
+
+<div id="workspace">
+  <div class="sidebar">
+    <div class="nav-btn active" id="current-role-display">ROLE: ARCHITECT</div>
+    <button class="nav-btn" onclick="switchPortalSelect()">← SWITCH SECTOR</button>
+    <div style="margin-top: auto; font-family: var(--font-mono); font-size: 0.75rem; color: #8b949e;">
+      SYSTEM: CYDONIA FOUNDRY<br>
+      FREQUENCY: 39,420 HZ<br>
+      STATE: BOUND
+    </div>
+  </div>
+
+  <div class="work-main">
+    <div class="control-panel">
+      <h3 style="font-family: var(--font-mono); color: var(--accent-cyan);" id="panel-title">SIMULATE WORK UNIT</h3>
+      <div class="input-group">
+        <input type="text" id="task-input" placeholder="Enter work unit task or parameter...">
+        <button class="btn-exec" onclick="runSimulatedWorkUnit()">EXECUTE</button>
+      </div>
+    </div>
+
+    <div class="output-terminal" id="terminal-out">
+[SECTOR_9 // SYSTEM_READY]
+Select a task or type a custom command to initialize the work unit execution engine...
+    </div>
+  </div>
+
+  <div class="chat-panel">
+    <div class="chat-header" id="chat-header-title">WORKER COMM MATRIX</div>
+    <div class="chat-messages" id="chat-stream">
+      <div class="chat-msg">
+        <div class="chat-user">System Daemon</div>
+        <div>Worker chat matrix synchronized at 39,420 Hz. Ready for messages.</div>
+      </div>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chat-input" placeholder="Post update to grid..." onkeypress="handleChatKey(event)">
+    </div>
+  </div>
+</div>
+
+<script>
+let currentRole = 'ARCHITECT';
+
+function enterWorkspace(role) {
+  currentRole = role;
+  document.getElementById('portal-selection').style.display = 'none';
+  document.getElementById('workspace').style.display = 'grid';
+  document.getElementById('current-role-display').innerText = `ROLE: ${role}`;
+  document.getElementById('panel-title').innerText = `${role} WORK UNIT SIMULATOR`;
+  document.getElementById('chat-header-title').innerText = `${role} CHAT MATRIX`;
+
+  // Default terminal splash
+  document.getElementById('terminal-out').innerText = 
+    `[SECTOR_9 // WORK_UNIT_EXECUTION // ${role}_CORE]\n` +
+    `[CARRIER: 39,420 Hz // LEGENDRIAN BRAID LOGIC ACTIVE]\n\n` +
+    `Ready to execute ${role.toLowerCase()} operations. Type your prompt above to simulate execution.`;
+
+  loadDefaultChatMessages();
+}
+
+function switchPortalSelect() {
+  document.getElementById('workspace').style.display = 'none';
+  document.getElementById('portal-selection').style.display = 'flex';
+}
+
+function runSimulatedWorkUnit() {
+  const input = document.getElementById('task-input').value || "Default Operational Sweep";
+  const term = document.getElementById('terminal-out');
+  
+  term.innerText = `[EXECUTING TASK: "${input}"]\n[PHASE-LOCKING CARRIER AT 39,420 Hz...]\n\n`;
+
+  setTimeout(() => {
+    if (currentRole === 'ARCHITECT') {
+      term.innerText += 
+        `// ARCHITECT CODE GENERATED\n` +
+        `// SPDX-License-Identifier: BSL-1.1\n` +
+        `pragma solidity ^0.8.24;\n\n` +
+        `contract ${input.replace(/\s+/g, '')} {\n` +
+        `    bytes32 public constant DOMAIN_HASH = keccak256("SINTER_LATTICE_39420HZ");\n` +
+        `    function verifyState(bytes32 proof) external pure returns (bool) {\n` +
+        `        return proof != bytes32(0);\n` +
+        `    }\n` +
+        `}\n\n` +
+        `[STATUS]: Contract compiled, memory safe, ZK proof verified.`;
+    } else if (currentRole === 'OPERATOR') {
+      term.innerText += 
+        `==================================================================\n` +
+        `           FIELD OPERATION EXECUTION LOG // ${input.toUpperCase()}\n` +
+        `==================================================================\n` +
+        `[1] Infiltration vector mapped through Sub-Level conduits.\n` +
+        `[2] Payload cache inspected using quantum-resonance probe.\n` +
+        `[3] Biometric verification locked at local node bay.\n\n` +
+        `[STATUS]: Mission completed within operational window. Dead drop secure.`;
+    } else if (currentRole === 'INVESTOR') {
+      term.innerText += 
+        `==================================================================\n` +
+        `           4IR FINANCIAL DEPLOYMENT // ${input.toUpperCase()}\n` +
+        `==================================================================\n` +
+        `[ARBITRAGE SPREAD]: Captured +1.42% yield on transient pool imbalance.\n` +
+        `[NODE EQUITY]: Funded 3 fringe relays with early-investor multipliers.\n` +
+        `[PREDICTIVE CASCADE]: Harmonic model locked for 39,420 Hz shift.\n\n` +
+        `[STATUS]: Capital injected. Yield deposited into $BRAID reserves.`;
+    }
+  }, 400);
+}
+
+function loadDefaultChatMessages() {
+  const stream = document.getElementById('chat-stream');
+  if (currentRole === 'ARCHITECT') {
+    stream.innerHTML = `
+      <div class="chat-msg"><div class="chat-user">Möbius_Dev</div><div>Refactored the Rust verifier. Groth16 checks are down to sub-microseconds.</div></div>
+      <div class="chat-msg"><div class="chat-user">Braid</div><div>Pushed the new Flux Syntax endpoints to braidmesh.com. Test sinter-align when ready.</div></div>
+    `;
+  } else if (currentRole === 'OPERATOR') {
+    stream.innerHTML = `
+      <div class="chat-msg"><div class="chat-user">Courier_07</div><div>Sewer Annex drop complete. Cryo-node is secured and waiting for handoff.</div></div>
+      <div class="chat-msg"><div class="chat-user">Recon_Unit</div><div>Neon Spine backbone seals checked. No breach signatures detected on port 4.</div></div>
+    `;
+  } else if (currentRole === 'INVESTOR') {
+    stream.innerHTML = `
+      <div class="chat-msg"><div class="chat-user">Quant_Sinter</div><div>Liquidity pulse injected into Nexus-7 pool. APY stabilized at target metrics.</div></div>
+      <div class="chat-msg"><div class="chat-user">DePIN_Seed</div><div>Red Sector relay node locked in early-bird multiplier tier.</div></div>
+    `;
+  }
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter') {
+    const chatInput = document.getElementById('chat-input');
+    const msg = chatInput.value;
+    if (!msg) return;
+
+    const stream = document.getElementById('chat-stream');
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'chat-msg';
+    msgDiv.innerHTML = `<div class="chat-user" style="color: var(--accent-cyan);">You (Architect)</div><div>${msg}</div>`;
+    stream.appendChild(msgDiv);
+    chatInput.value = '';
+    stream.scrollTop = stream.scrollHeight;
+  }
+}
+</script>
+</body>
+</html>
