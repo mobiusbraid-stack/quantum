@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SINTER // QUANTUM RELAY CALIBRATION</title>
+<style>
+  :root {
+    --bg-dark: #0b0f19;
+    --panel-bg: #161b22;
+    --border-color: #30363d;
+    --accent-cyan: #58a6ff;
+    --accent-amber: #f0883e;
+    --accent-green: #3fb950;
+    --text-main: #c9d1d9;
+    --font-mono: 'Courier New', Courier, monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 900px;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 25px;
+  }
+
+  header {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+  }
+
+  h1 { font-size: 1.3rem; color: var(--accent-cyan); letter-spacing: 1.5px; }
+  .subtitle { font-size: 0.85rem; color: #8b949e; margin-top: 5px; }
+
+  .controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  button {
+    background: #0d1117;
+    border: 1px solid var(--border-color);
+    color: var(--accent-cyan);
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  button:hover {
+    background: rgba(88, 166, 255, 0.15);
+    border-color: var(--accent-cyan);
+  }
+
+  button.exec {
+    background: var(--accent-cyan);
+    color: #000;
+  }
+  button.exec:hover { opacity: 0.9; }
+
+  .telemetry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+
+  .stat-card {
+    background: #0d1117;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 12px;
+  }
+
+  .stat-label { font-size: 0.75rem; color: #8b949e; text-transform: uppercase; }
+  .stat-val { font-size: 1.1rem; color: var(--accent-amber); font-weight: bold; margin-top: 4px; }
+
+  .terminal {
+    background: #05070a;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 15px;
+    font-size: 0.85rem;
+    height: 320px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    color: #3fb950;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>QUANTUM RELAY CALIBRATION ENGINE v1.0</h1>
+    <div class="subtitle">HOMOTOPY BRAID TRACING // TANGLE CATEGORY MODULI // 39,420 Hz LOCK</div>
+  </header>
+
+  <div class="controls">
+    <button onclick="addGenerator('σ1')">+ σ1 (Strand 1 Swap)</button>
+    <button onclick="addGenerator('σ1⁻¹')">+ σ1⁻¹ (Inverse Strand 1)</button>
+    <button onclick="addGenerator('σ2')">+ σ2 (Strand 2 Swap)</button>
+    <button onclick="reduceBraid()">REDUCE HOMOTOPY CLASS</button>
+    <button class="exec" onclick="calibrateRelay()">CALIBRATE ENTANGLEMENT</button>
+  </div>
+
+  <div class="telemetry-grid">
+    <div class="stat-card">
+      <div class="stat-label">STRANDS / MESH</div>
+      <div class="stat-val" id="strands-val">3 Strands // B₃ Group</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">BRAID WORD</div>
+      <div class="stat-val" id="word-val" style="color: var(--accent-cyan);">e (Identity)</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">MODULI FREQUENCY</div>
+      <div class="stat-val" id="freq-val">39,420.00 Hz</div>
+    </div>
+  </div>
+
+  <div class="terminal" id="term-out">
+[SECTOR_9 // QUANTUM_RELAY_INIT]
+System online. Add braid generators (σ_i) or execute reduction to trace tangle moduli space...
+  </div>
+</div>
+
+<script>
+let braidWord = [];
+const BASE_FREQ = 39420.0;
+
+function updateUI() {
+  const wordDisplay = braidWord.length === 0 ? "e (Identity)" : braidWord.join(" · ");
+  document.getElementById('word-val').innerText = wordDisplay;
+}
+
+function addGenerator(gen) {
+  braidWord.push(gen);
+  updateUI();
+  log(`[GENERATOR_ADDED]: Appended ${gen} to word stream.`);
+}
+
+function reduceBraid() {
+  log(`\n[HOMOTOPY_REDUCTION]: Applying Markov moves (σ_i · σ_i⁻¹ = id)...`);
+  let reduced = [];
+  let i = 0;
+  
+  while (i < braidWord.length) {
+    if (i + 1 < braidWord.length) {
+      const current = braidWord[i];
+      const next = braidWord[i+1];
+      if ((current === 'σ1' && next === 'σ1⁻¹') || (current === 'σ1⁻¹' && next === 'σ1') ||
+          (current === 'σ2' && next === 'σ2⁻¹') || (current === 'σ2⁻¹' && next === 'σ2')) {
+        log(`  ↳ CANCELLATION DETECTED: (${current} · ${next}) -> id`);
+        i += 2;
+        continue;
+      }
+    }
+    reduced.push(braidWord[i]);
+    i++;
+  }
+  
+  braidWord = reduced;
+  updateUI();
+  log(`[REDUCTION_COMPLETE]: Canonical homotopy class established.\n`);
+}
+
+function calibrateRelay() {
+  log(`\n==================================================================`);
+  log(`         CALIBRATING TANGLE CATEGORY MODULI & ENTANGLEMENT`);
+  log(`==================================================================`);
+  
+  // Calculate writhe
+  let writhe = 0;
+  braidWord.forEach(g => {
+    if (g === 'σ1' || g === 'σ2') writhe += 1;
+    if (g === 'σ1⁻¹' || g === 'σ2⁻¹') writhe -= 1;
+  });
+
+  // Moduli phase angle calculation mapped to 39,420 Hz
+  const phaseOffset = Math.sin(writhe * (Math.PI / 4.0));
+  const calibratedFreq = (BASE_FREQ + phaseOffset).toFixed(2);
+
+  document.getElementById('freq-val').innerText = `${calibratedFreq} Hz`;
+
+  log(`[WRITHE NUMBER w(K)]: ${writhe}`);
+  log(`[YANG-BAXTER RELATIONS]: Verified (R ⊗ I)(I ⊗ R)(R ⊗ I) ≅ (I ⊗ R)(R ⊗ I)(I ⊗ R)`);
+  log(`[PHASE ANGLE SHIFT]: Δθ = ${phaseOffset.toFixed(4)} rad`);
+  log(`[CARRIER FREQUENCY]: Locked at ${calibratedFreq} Hz`);
+  log(`[RESULT]: Quantum Entanglement Phase-Locked to Sinter Lattice.\n`);
+}
+
+function log(msg) {
+  const term = document.getElementById('term-out');
+  term.innerText += msg + "\n";
+  term.scrollTop = term.scrollHeight;
+}
+</script>
+</body>
+</html>
